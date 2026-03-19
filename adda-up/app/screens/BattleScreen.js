@@ -144,6 +144,17 @@ export default function BattleScreen({ navigation }) {
         voters: [...(battle.voters || []), myUid],
       });
       await updateDoc(doc(db, 'users', myUid), { coins: increment(1) });
+      // Notify battle creator
+      if (battle.createdByUid && battle.createdByUid !== myUid) {
+        const myDoc = await getDoc(doc(db, 'users', myUid));
+        const myName = myDoc.data()?.username || 'Kisi ne';
+        await addDoc(collection(db, 'notifications'), {
+          toUid: battle.createdByUid, fromUid: myUid,
+          type: 'battle_vote',
+          message: `${myName} ne teri battle mein vote kiya! 🗳️`,
+          read: false, createdAt: serverTimestamp(),
+        });
+      }
     } catch (e) {}
   };
 
@@ -161,13 +172,16 @@ export default function BattleScreen({ navigation }) {
 
   const shareBattleToFollowers = async () => {
     if (!shareBattle) return;
+    const myUserDoc = await getDoc(doc(db, 'users', myUid));
+    const myUsername = myUserDoc.data()?.username || 'Kisi ne';
     const uids = selectedFollowers.length > 0 ? selectedFollowers : followers.map(f => f.uid);
     for (const uid of uids) {
       try {
         await addDoc(collection(db, 'notifications'), {
           toUid: uid,
+          fromUid: myUid,
           type: 'battle_share',
-          message: `${auth.currentUser.displayName || 'Kisi ne'} ne tumhe battle share kiya: "${shareBattle.question}"`,
+          message: `${myUsername} ne tumhe battle share kiya: "${shareBattle.question}"`,
           battleCode: shareBattle.code,
           read: false,
           createdAt: serverTimestamp(),

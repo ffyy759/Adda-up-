@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { auth } from './app/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform } from 'react-native';
 
 import LoginScreen from './app/screens/LoginScreen';
 import SignupScreen from './app/screens/SignupScreen';
@@ -14,6 +14,7 @@ import SearchScreen from './app/screens/SearchScreen';
 import BattleScreen from './app/screens/BattleScreen';
 import LeaderboardScreen from './app/screens/LeaderboardScreen';
 import ChatScreen from './app/screens/ChatScreen';
+import TerritoryScreen from './app/screens/TerritoryScreen';
 import CoinsScreen from './app/screens/CoinsScreen';
 import DMScreen from './app/screens/DMScreen';
 import GroupChatScreen from './app/screens/GroupChatScreen';
@@ -33,12 +34,14 @@ function MainTabs() {
           backgroundColor: '#16213e',
           borderTopColor: '#0f3460',
           borderTopWidth: 1,
-          height: 58,
-          paddingBottom: 6,
-          paddingTop: 4,
+          height: Platform.OS === 'android' ? 68 : 82,
+          paddingBottom: Platform.OS === 'android' ? 12 : 22,
+          paddingTop: 6,
+          elevation: 10,
         },
         tabBarActiveTintColor: '#ff6b35',
-        tabBarInactiveTintColor: '#444',
+        tabBarInactiveTintColor: '#555',
+        tabBarLabelStyle: { fontSize: 18, marginBottom: 2 },
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: '🏠' }} />
@@ -66,7 +69,7 @@ export default function App() {
   }, []);
 
   if (loading) return (
-    <View style={{ flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#1a1a2e' }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1a2e' }}>
       <ActivityIndicator size="large" color="#ff6b35" />
     </View>
   );
